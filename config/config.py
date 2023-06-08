@@ -10,6 +10,7 @@ class Config:
     DEBUG = True
     SECRET_KEY = "mysecretkey"
     JSON_SORT_KEYS = False
+    template_folder = "app/templates"
 
 
 # Settings for Flask in development

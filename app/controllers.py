@@ -7,6 +7,13 @@ import aiohttp
 import requests
 from flask import jsonify
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import io
+import base64
+
 
 # create a memory cache with a time to live of 10 minutes
 cache = TTLCache(maxsize=100, ttl=600)
@@ -128,3 +135,31 @@ def get_berries_statics():
         "frequency_growth_time": frequency_growth_time,
     }
     return jsonify(result)
+
+
+def generate_histogram():
+    """get the data from get_berries_statics and generate a histogram"""
+
+    if not data_berries:
+        get_berries_statics()
+    data = [x["growth_time"] for x in data_berries.values()]
+
+    # Create the plot sorted by the growth time
+    plt.hist(data, bins=10, color="blue", edgecolor="black")
+
+    plt.xlabel("Value")
+    plt.ylabel("Frecuency")
+    plt.title("Histogram of Frequency Growth Time")
+
+    # Save the image as object BytesIO
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+
+    # Encode the image to base64
+    image_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    # return the image as html
+    html = f'<img src="data:image/png;base64,{image_base64}" alt="Histogram">'
+
+    return html

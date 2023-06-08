@@ -1,7 +1,7 @@
 """ This module contains the routes of the app """
-from flask import jsonify
+from flask import jsonify, render_template
 from app import app
-from app.controllers import get_berries_statics
+from app.controllers import get_berries_statics, generate_histogram
 
 
 # Custom 404 error handler
@@ -25,3 +25,18 @@ def get_data():
     response_headers = {"Content-Type": "application/json"}
     data = get_berries_statics()
     return data, 200, response_headers
+
+
+@app.route("/allBerryStats/histogram", methods=["GET"])
+def get_histogram():
+    """create a histogram from the data of the berries"""
+    response_headers = {"Content-Type": "text/html"}
+    histogram_html = generate_histogram()
+    return (
+        render_template(
+            "berries_histogram.html",
+            histogram_html=histogram_html,
+        ),
+        200,
+        response_headers,
+    )
